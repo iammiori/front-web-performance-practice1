@@ -62,10 +62,6 @@ jobs:
             - **커밋 메시지**: ${commit.message}
             - **작성자**: ${commit.author.name}
             - **SHA**: [\`${commit.id.substring(0, 7)}\`](${commit.url})
-            - **변경된 파일**: ${commit.added.length + commit.modified.length + commit.removed.length}개
-              - 추가: ${commit.added.length}개
-              - 수정: ${commit.modified.length}개
-              - 삭제: ${commit.removed.length}개
             `;
 
             const lhciDir = '.lighthouseci';
