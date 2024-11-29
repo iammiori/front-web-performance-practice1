@@ -1,7 +1,8 @@
+
 # 성능 개선 보고서
-
-<a href="https://d36tutom3ehed0.cloudfront.net/" target="_blank">배포 URL (CloudFront)</a>
-
+- <a href="https://d36tutom3ehed0.cloudfront.net/" target="_blank">배포 URL (CloudFront)</a>
+- github Actions 로, performace result 이슈로 자동 생성
+   - 이때, 어떤 커밋에 의해 측정된 결과인지 파악하기 위해, SHA 와 커밋메시지를 추가
 
 ## Image Optimization: JPG to WebP Conversion
 
