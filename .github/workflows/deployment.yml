@@ -10,10 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     environment: dev
 
-    env:
-      GITHUB_REPOSITORY: ${{ github.server_url }}/${{ github.repository }}
-      ACTION_URI: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
     steps:
       - uses: actions/checkout@v4
 
@@ -22,6 +18,10 @@ jobs:
         run: |
           SLACK_ID=$(echo '${{ secrets.SLACK_USER_MAPPING }}' | jq -r '."${{ github.actor }}"')
           echo "user_id=$SLACK_ID" >> $GITHUB_OUTPUT
+
+      - name: Get short SHA
+        id: get-sha
+        run: echo "short_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
       - name: Send deployment start notification
         uses: slackapi/slack-github-action@v1.24.0
@@ -65,7 +65,7 @@ jobs:
                     },
                     {
                       "type": "mrkdwn",
-                      "text": "*배포버전(커밋번호)*\n`${{ github.sha }}`"
+                      "text": "*배포버전(커밋번호)*\n`${{ steps.get-sha.outputs.short_sha }}`"
                     }
                   ]
                 }
@@ -137,10 +137,10 @@ jobs:
                     },
                     {
                       "type": "mrkdwn",
-                      "text": "*배포버전(커밋번호)*\n`${{ github.sha }}`"
+                      "text": "*배포버전(커밋번호)*\n`${{ steps.get-sha.outputs.short_sha }}`"
                     }
                   ]
-                },
+                }
               ]
             }
 
@@ -187,9 +187,9 @@ jobs:
                     },
                     {
                       "type": "mrkdwn",
-                      "text": "*배포버전(커밋번호)*\n`${{ github.sha }}`"
+                      "text": "*배포버전(커밋번호)*\n`${{ steps.get-sha.outputs.short_sha }}`"
                     }
                   ]
-                },
+                }
               ]
             }
