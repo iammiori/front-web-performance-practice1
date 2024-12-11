@@ -61,11 +61,11 @@ jobs:
                   "fields": [
                     {
                       "type": "mrkdwn",
-                      "text": "*브랜치*\n${{ github.ref_name }}"
+                      "text": "*branch*\n${{ github.ref_name }}"
                     },
                     {
                       "type": "mrkdwn",
-                      "text": "*배포버전(커밋번호)*\n`${{ steps.get-sha.outputs.short_sha }}`"
+                      "text": "*배포버전(sha)*\n`${{ steps.get-sha.outputs.short_sha }}`"
                     }
                   ]
                 }
@@ -133,11 +133,11 @@ jobs:
                   "fields": [
                     {
                       "type": "mrkdwn",
-                      "text": "*브랜치*\n${{ github.ref_name }}"
+                      "text": "*branch*\n${{ github.ref_name }}"
                     },
                     {
                       "type": "mrkdwn",
-                      "text": "*배포버전(커밋번호)*\n`${{ steps.get-sha.outputs.short_sha }}`"
+                      "text": "*배포버전(sha)*\n`${{ steps.get-sha.outputs.short_sha }}`"
                     }
                   ]
                 }
@@ -183,11 +183,11 @@ jobs:
                   "fields": [
                     {
                       "type": "mrkdwn",
-                      "text": "*브랜치*\n${{ github.ref_name }}"
+                      "text": "*branch*\n${{ github.ref_name }}"
                     },
                     {
                       "type": "mrkdwn",
-                      "text": "*배포버전(커밋번호)*\n`${{ steps.get-sha.outputs.short_sha }}`"
+                      "text": "*배포버전(sha)*\n`${{ steps.get-sha.outputs.short_sha }}`"
                     }
                   ]
                 }
