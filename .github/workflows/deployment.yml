@@ -1,4 +1,3 @@
-
 name: Deploy to AWS
 
 on:
@@ -11,13 +10,102 @@ jobs:
     runs-on: ubuntu-latest
     environment: dev
 
+    env:
+      DEPLOY_START_MESSAGE: |
+        {
+          "blocks": [
+            {
+              "type": "header",
+              "text": {
+                "type": "plain_text",
+                "text": "🚀 Frontend 배포 시작",
+                "emoji": true
+              }
+            },
+            {
+              "type": "section",
+              "fields": [
+                {
+                  "type": "mrkdwn",
+                  "text": "*환경:*\ndev"
+                },
+                {
+                  "type": "mrkdwn", 
+                  "text": "*커밋:*\n`${{ github.sha }}`"
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "fields": [
+                {
+                  "type": "mrkdwn",
+                  "text": "*브랜치:*\n${{ github.ref_name }}"
+                },
+                {
+                  "type": "mrkdwn",
+                  "text": "*작업자:*\n${{ github.actor }}"
+                }
+              ]
+            }
+          ]
+        }
+      DEPLOY_COMPLETE_MESSAGE: |
+        {
+          "blocks": [
+            {
+              "type": "header",
+              "text": {
+                "type": "plain_text",
+                "text": "${{ job.status == 'success' && '✅ Frontend 배포 완료' || '❌ Frontend 배포 실패' }}",
+                "emoji": true
+              }
+            },
+            {
+              "type": "section",
+              "fields": [
+                {
+                  "type": "mrkdwn",
+                  "text": "*환경:*\ndev"
+                },
+                {
+                  "type": "mrkdwn",
+                  "text": "*상태:*\n${{ job.status == 'success' && '성공 🎉' || '실패 ⚠️' }}"
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "fields": [
+                {
+                  "type": "mrkdwn",
+                  "text": "*커밋:*\n`${{ github.sha }}`"
+                },
+                {
+                  "type": "mrkdwn",
+                  "text": "*작업자:*\n${{ github.actor }}"
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "fields": [
+                {
+                  "type": "mrkdwn",
+                  "text": "*브랜치:*\n${{ github.ref_name }}"
+                }
+              ]
+            }
+          ]
+        }
+
     steps:
       - uses: actions/checkout@v4
       
       - name: Send deployment start notification
         uses: curl/actions/curl@v1
         with:
-          args: -X POST -H 'Content-type: application/json' --data '${{ env.DEPLOY_START_MESSAGE }}' ${{ secrets.SLACK_WEBHOOK_URL }}
+          args: -X POST -H 'Content-type: application/json' --data "$DEPLOY_START_MESSAGE" ${{ secrets.SLACK_WEBHOOK_URL }}
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -45,4 +133,4 @@ jobs:
         if: always()
         uses: curl/actions/curl@v1
         with:
-          args: -X POST -H 'Content-type: application/json' --data '${{ env.DEPLOY_COMPLETE_MESSAGE }}' ${{ secrets.SLACK_WEBHOOK_URL }}
+          args: -X POST -H 'Content-type: application/json' --data "$DEPLOY_COMPLETE_MESSAGE" ${{ secrets.SLACK_WEBHOOK_URL }}
