@@ -20,8 +20,8 @@ jobs:
       - name: Get Slack User ID
         id: slack-user
         run: |
-          MAPPING='${{ secrets.SLACK_USER_MAPPING }}'
-          echo "user_id=$(echo $MAPPING | jq -r '."${{ github.actor }}"')" >> $GIT
+          SLACK_ID=$(echo '${{ secrets.SLACK_USER_MAPPING }}' | jq -r '."${{ github.actor }}"')
+          echo "user_id=$SLACK_ID" >> $GITHUB_OUTPUT
 
       - name: Send deployment start notification
         uses: slackapi/slack-github-action@v1.24.0
