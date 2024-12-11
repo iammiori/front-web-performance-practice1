@@ -11,101 +11,83 @@ jobs:
     environment: dev
 
     env:
-      DEPLOY_START_MESSAGE: |
-        {
-          "blocks": [
-            {
-              "type": "header",
-              "text": {
-                "type": "plain_text",
-                "text": "🚀 Frontend 배포 시작",
-                "emoji": true
-              }
-            },
-            {
-              "type": "section",
-              "fields": [
-                {
-                  "type": "mrkdwn",
-                  "text": "*환경:*\ndev"
-                },
-                {
-                  "type": "mrkdwn", 
-                  "text": "*커밋:*\n`${{ github.sha }}`"
-                }
-              ]
-            },
-            {
-              "type": "section",
-              "fields": [
-                {
-                  "type": "mrkdwn",
-                  "text": "*브랜치:*\n${{ github.ref_name }}"
-                },
-                {
-                  "type": "mrkdwn",
-                  "text": "*작업자:*\n${{ github.actor }}"
-                }
-              ]
-            }
-          ]
-        }
-      DEPLOY_COMPLETE_MESSAGE: |
-        {
-          "blocks": [
-            {
-              "type": "header",
-              "text": {
-                "type": "plain_text",
-                "text": "${{ job.status == 'success' && '✅ Frontend 배포 완료' || '❌ Frontend 배포 실패' }}",
-                "emoji": true
-              }
-            },
-            {
-              "type": "section",
-              "fields": [
-                {
-                  "type": "mrkdwn",
-                  "text": "*환경:*\ndev"
-                },
-                {
-                  "type": "mrkdwn",
-                  "text": "*상태:*\n${{ job.status == 'success' && '성공 🎉' || '실패 ⚠️' }}"
-                }
-              ]
-            },
-            {
-              "type": "section",
-              "fields": [
-                {
-                  "type": "mrkdwn",
-                  "text": "*커밋:*\n`${{ github.sha }}`"
-                },
-                {
-                  "type": "mrkdwn",
-                  "text": "*작업자:*\n${{ github.actor }}"
-                }
-              ]
-            },
-            {
-              "type": "section",
-              "fields": [
-                {
-                  "type": "mrkdwn",
-                  "text": "*브랜치:*\n${{ github.ref_name }}"
-                }
-              ]
-            }
-          ]
-        }
+      GITHUB_REPOSITORY: ${{ github.server_url }}/${{ github.repository }}
+      ACTION_URI: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Send deployment start notification
-        uses: curl/actions/curl@v1
+        uses: slackapi/slack-github-action@v1.24.0
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
         with:
-          args: -X POST -H 'Content-type: application/json' --data "$DEPLOY_START_MESSAGE" ${{ secrets.SLACK_WEBHOOK_URL }}
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "🚀 Frontend 배포를 시작합니다!",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*작업자*\n${{ github.actor }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*환경*\ndev"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*브랜치*\n${{ github.ref_name }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*커밋*\n`${{ github.sha }}`"
+                    }
+                  ]
+                },
+                {
+                  "type": "divider"
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "emoji": true,
+                        "text": "GitHub 바로가기"
+                      },
+                      "url": "${{ env.GITHUB_REPOSITORY }}"
+                    },
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "emoji": true,
+                        "text": "Actions 로그"
+                      },
+                      "url": "${{ env.ACTION_URI }}"
+                    }
+                  ]
+                }
+              ]
+            }
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -130,7 +112,148 @@ jobs:
             --paths "/*"
 
       - name: Send deployment complete notification
-        if: always()
-        uses: curl/actions/curl@v1
+        if: success()
+        uses: slackapi/slack-github-action@v1.24.0
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
         with:
-          args: -X POST -H 'Content-type: application/json' --data "$DEPLOY_COMPLETE_MESSAGE" ${{ secrets.SLACK_WEBHOOK_URL }}
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "✅ Frontend 배포가 완료되었습니다!",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*작업자*\n${{ github.actor }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*환경*\ndev"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*브랜치*\n${{ github.ref_name }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*커밋*\n`${{ github.sha }}`"
+                    }
+                  ]
+                },
+                {
+                  "type": "divider"
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "emoji": true,
+                        "text": "GitHub 바로가기"
+                      },
+                      "url": "${{ env.GITHUB_REPOSITORY }}"
+                    },
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "emoji": true,
+                        "text": "Actions 로그"
+                      },
+                      "url": "${{ env.ACTION_URI }}"
+                    }
+                  ]
+                }
+              ]
+            }
+
+      - name: Send deployment failed notification
+        if: failure()
+        uses: slackapi/slack-github-action@v1.24.0
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+        with:
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "❌ Frontend 배포가 실패했습니다",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*작업자*\n${{ github.actor }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*환경*\ndev"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*브랜치*\n${{ github.ref_name }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*커밋*\n`${{ github.sha }}`"
+                    }
+                  ]
+                },
+                {
+                  "type": "divider"
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "emoji": true,
+                        "text": "GitHub 바로가기"
+                      },
+                      "url": "${{ env.GITHUB_REPOSITORY }}"
+                    },
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "emoji": true,
+                        "text": "Actions 로그 확인",
+                        "style": "danger"
+                      },
+                      "url": "${{ env.ACTION_URI }}"
+                    }
+                  ]
+                }
+              ]
+            }
