@@ -17,6 +17,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Get Slack User ID
+        id: slack-user
+        run: |
+          MAPPING='${{ secrets.SLACK_USER_MAPPING }}'
+          echo "user_id=$(echo $MAPPING | jq -r '."${{ github.actor }}"')" >> $GIT
+
       - name: Send deployment start notification
         uses: slackapi/slack-github-action@v1.24.0
         env:
@@ -35,11 +41,14 @@ jobs:
                   }
                 },
                 {
+                  "type": "divider"
+                },
+                {
                   "type": "section",
                   "fields": [
                     {
                       "type": "mrkdwn",
-                      "text": "*작업자*\n${{ github.actor }}"
+                      "text": "*배포 담당자*\n<@${{ steps.slack-user.outputs.user_id }}>"
                     },
                     {
                       "type": "mrkdwn",
@@ -56,33 +65,7 @@ jobs:
                     },
                     {
                       "type": "mrkdwn",
-                      "text": "*커밋*\n`${{ github.sha }}`"
-                    }
-                  ]
-                },
-                {
-                  "type": "divider"
-                },
-                {
-                  "type": "actions",
-                  "elements": [
-                    {
-                      "type": "button",
-                      "text": {
-                        "type": "plain_text",
-                        "emoji": true,
-                        "text": "GitHub 바로가기"
-                      },
-                      "url": "${{ env.GITHUB_REPOSITORY }}"
-                    },
-                    {
-                      "type": "button",
-                      "text": {
-                        "type": "plain_text",
-                        "emoji": true,
-                        "text": "Actions 로그"
-                      },
-                      "url": "${{ env.ACTION_URI }}"
+                      "text": "*배포버전(커밋번호)*\n`${{ github.sha }}`"
                     }
                   ]
                 }
@@ -130,11 +113,14 @@ jobs:
                   }
                 },
                 {
+                  "type": "divider"
+                },
+                {
                   "type": "section",
                   "fields": [
                     {
                       "type": "mrkdwn",
-                      "text": "*작업자*\n${{ github.actor }}"
+                      "text": "*배포 담당자*\n<@${{ steps.slack-user.outputs.user_id }}>"
                     },
                     {
                       "type": "mrkdwn",
@@ -151,36 +137,10 @@ jobs:
                     },
                     {
                       "type": "mrkdwn",
-                      "text": "*커밋*\n`${{ github.sha }}`"
+                      "text": "*배포버전(커밋번호)*\n`${{ github.sha }}`"
                     }
                   ]
                 },
-                {
-                  "type": "divider"
-                },
-                {
-                  "type": "actions",
-                  "elements": [
-                    {
-                      "type": "button",
-                      "text": {
-                        "type": "plain_text",
-                        "emoji": true,
-                        "text": "GitHub 바로가기"
-                      },
-                      "url": "${{ env.GITHUB_REPOSITORY }}"
-                    },
-                    {
-                      "type": "button",
-                      "text": {
-                        "type": "plain_text",
-                        "emoji": true,
-                        "text": "Actions 로그"
-                      },
-                      "url": "${{ env.ACTION_URI }}"
-                    }
-                  ]
-                }
               ]
             }
 
@@ -203,11 +163,14 @@ jobs:
                   }
                 },
                 {
+                  "type": "divider"
+                },
+                {
                   "type": "section",
                   "fields": [
                     {
                       "type": "mrkdwn",
-                      "text": "*작업자*\n${{ github.actor }}"
+                      "text": "*배포 담당자*\n<@${{ steps.slack-user.outputs.user_id }}>"
                     },
                     {
                       "type": "mrkdwn",
@@ -224,36 +187,9 @@ jobs:
                     },
                     {
                       "type": "mrkdwn",
-                      "text": "*커밋*\n`${{ github.sha }}`"
+                      "text": "*배포버전(커밋번호)*\n`${{ github.sha }}`"
                     }
                   ]
                 },
-                {
-                  "type": "divider"
-                },
-                {
-                  "type": "actions",
-                  "elements": [
-                    {
-                      "type": "button",
-                      "text": {
-                        "type": "plain_text",
-                        "emoji": true,
-                        "text": "GitHub 바로가기"
-                      },
-                      "url": "${{ env.GITHUB_REPOSITORY }}"
-                    },
-                    {
-                      "type": "button",
-                      "text": {
-                        "type": "plain_text",
-                        "emoji": true,
-                        "text": "Actions 로그 확인",
-                        "style": "danger"
-                      },
-                      "url": "${{ env.ACTION_URI }}"
-                    }
-                  ]
-                }
               ]
             }
